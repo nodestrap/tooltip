@@ -1,0 +1,40 @@
+{
+  "name": "@nodestrap/tooltip",
+  "version": "4.0.0",
+  "description": "Represents advisory information related to the element it belongs.",
+  "type": "module",
+  "main": "dist/Tooltip.jsx",
+  "types": "dist/Tooltip.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodestrap/tooltip.git"
+  },
+  "keywords": [
+    "tooltip",
+    "label",
+    "component",
+    "element",
+    "react",
+    "nodestrap",
+    "styled"
+  ],
+  "author": "heymarco",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nodestrap/tooltip/issues"
+  },
+  "homepage": "https://github.com/nodestrap/tooltip#readme",
+  "dependencies": {
+    "@cssfn/css-config": "^1.0.1",
+    "@cssfn/cssfn": "^1.0.3",
+    "@cssfn/react-cssfn": "^1.0.3",
+    "@nodestrap/basic": "^4.0.2",
+    "@nodestrap/popup": "^4.0.1",
+    "@nodestrap/typos": "^4.0.0",
+    "@types/react": "^17.0.36",
+    "react": "^17.0.2"
+  }
+}
