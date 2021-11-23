@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/tooltip",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Represents advisory information related to the element it belongs.",
   "type": "module",
   "main": "dist/Tooltip.jsx",
