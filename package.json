@@ -1,9 +1,9 @@
 {
   "name": "@nodestrap/tooltip",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Represents advisory information related to the element it belongs.",
   "type": "module",
-  "main": "dist/Tooltip.jsx",
+  "main": "dist/Tooltip.js",
   "types": "dist/Tooltip.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -31,10 +31,10 @@
     "@cssfn/css-config": "^1.0.1",
     "@cssfn/cssfn": "^1.0.3",
     "@cssfn/react-cssfn": "^1.0.3",
-    "@nodestrap/basic": "^4.0.2",
-    "@nodestrap/popup": "^4.0.1",
+    "@nodestrap/basic": "^4.0.3",
+    "@nodestrap/popup": "^4.0.2",
     "@nodestrap/typos": "^4.0.0",
-    "@types/react": "^17.0.36",
+    "@types/react": "^17.0.37",
     "react": "^17.0.2"
   }
 }

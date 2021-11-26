@@ -249,25 +249,17 @@ export function Tooltip(props) {
         };
     }, [active, props.targetRef]); // (re)run the setups & cleanups on every time the `active` & tooltip's target changes
     // jsx:
-    return (<Popup 
-    // other props:
-    {...restProps} 
-    // semantics:
-    semanticTag={props.semanticTag ?? [null]} semanticRole={props.semanticRole ?? 'tooltip'} 
-    // accessibilities:
-    {...{
-        active: activeDbFn,
-        inheritActive: false,
-    }} 
-    // popups:
-    popupPlacement={props.popupPlacement ?? 'top'} 
-    // classes:
-    mainClass={props.mainClass ?? sheet.main}>
-            {props.children}
-            <div 
-    // semantics:
-    aria-hidden={true} // the arrow is just for decoration purpose, no meaningful content here
-     data-popper-arrow></div>
-        </Popup>);
+    return (React.createElement(Popup, { ...restProps, 
+        // semantics:
+        semanticTag: props.semanticTag ?? [null], semanticRole: props.semanticRole ?? 'tooltip', ...{
+            active: activeDbFn,
+            inheritActive: false,
+        }, 
+        // popups:
+        popupPlacement: props.popupPlacement ?? 'top', 
+        // classes:
+        mainClass: props.mainClass ?? sheet.main },
+        props.children,
+        React.createElement("div", { "aria-hidden": true, "data-popper-arrow": true })));
 }
 export { Tooltip as default };
