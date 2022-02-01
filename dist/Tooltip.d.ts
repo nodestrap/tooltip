@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import { PopupPlacement, PopupModifier, PopupPosition, PopupProps } from '@nodestrap/popup';
-export declare const usesTooltipLayout: () => import("@cssfn/cssfn").StyleCollection;
-export declare const usesTooltipVariants: () => import("@cssfn/cssfn").StyleCollection;
-export declare const usesTooltipStates: () => import("@cssfn/cssfn").StyleCollection;
+export declare const usesTooltipLayout: () => import("@cssfn/cssfn").Rule;
+export declare const usesTooltipVariants: () => import("@cssfn/cssfn").Rule;
+export declare const usesTooltipStates: () => import("@cssfn/cssfn").Rule;
 export declare const useTooltipSheet: import("@cssfn/types").Factory<import("jss").Classes<"main">>;
 export declare const cssProps: import("@cssfn/css-config").Refs<{
     boxShadow: (string | number)[][];

@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/tooltip",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "Represents advisory information related to the element it belongs.",
   "type": "module",
   "main": "dist/Tooltip.js",
@@ -28,13 +28,13 @@
   },
   "homepage": "https://github.com/nodestrap/tooltip#readme",
   "dependencies": {
-    "@cssfn/css-config": "^1.0.1",
-    "@cssfn/cssfn": "^1.0.6",
-    "@cssfn/react-cssfn": "^1.0.9",
-    "@nodestrap/basic": "^4.0.4",
-    "@nodestrap/popup": "^4.0.4",
-    "@nodestrap/typos": "^4.0.3",
-    "@types/react": "^17.0.37",
+    "@cssfn/css-config": "^1.0.4",
+    "@cssfn/cssfn": "^1.0.11",
+    "@cssfn/react-cssfn": "^1.0.11",
+    "@nodestrap/basic": "^4.0.7",
+    "@nodestrap/popup": "^4.0.7",
+    "@nodestrap/typos": "^4.0.4",
+    "@types/react": "^17.0.38",
     "react": "^17.0.2"
   }
 }
