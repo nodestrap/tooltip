@@ -3,6 +3,8 @@ import {
     default as React,
     useState,
     useEffect,
+    useCallback,
+    useRef,
 }                           from 'react'         // base technology of our nodestrap components
 
 // cssfn:
@@ -46,6 +48,12 @@ import {
 // nodestrap utilities:
 import typos                from '@nodestrap/typos' // configurable typography (texting) defs
 
+// others libs:
+import type {
+    ComputePositionReturn,
+    Side as PopupSide,
+}                           from '@floating-ui/dom'
+
 // nodestrap components:
 import {
     // hooks:
@@ -58,8 +66,8 @@ import {
 import {
     // general types:
     PopupPlacement,
-    PopupModifier,
-    PopupPosition,
+    PopupMiddleware,
+    PopupStrategy,
     
     
     
@@ -77,18 +85,8 @@ import {
 
 
 
-// utilities:
-const isEnabled = (target: HTMLElement|null|undefined) => {
-    if (!target) return false; // if no target => assumes target as disabled
-    
-    return !target.matches(':disabled, .disable, .disabled')
-};
-
-
-
 // styles:
-const arrowWrapperElm = '[data-popper-arrow]';
-const arrowElm        = '::before';
+const arrowElm = '.arrow';
 
 export const usesTooltipLayout = () => {
     // dependencies:
@@ -109,54 +107,59 @@ export const usesTooltipLayout = () => {
         ]),
         ...style({
             // children:
-            ...children(arrowWrapperElm, {
+            ...children(arrowElm, {
                 // children:
-                ...children(arrowElm, {
-                    ...imports([
-                        // colors:
-                        border(),
-                        
-                        // borders:
-                        borderStroke(),
-                    ]),
-                    ...style({
-                        // layouts:
-                        display : 'block',
-                        content : '""',
-                        
-                        
-                        
-                        // backgrounds:
-                        backg   : backgRefs.backg,
-                        
-                        
-                        
-                        // borders:
-                        ...expandBorderStroke(), // expand borderStroke css vars
-                        borderInlineStartColor : 'transparent',
-                        borderBlockStartColor  : 'transparent',
-                        
-                        
-                        
-                        // customize:
-                        ...usesGeneralProps(usesPrefixedProps(cssProps, 'arrow')), // apply general cssProps starting with arrow***
-                    }),
+                ...imports([
+                    // colors:
+                    border(),
+                    
+                    // borders:
+                    borderStroke(),
+                ]),
+                ...style({
+                    // layouts:
+                    display  : 'block',
+                    content  : '""',
+                    
+                    
+                    
+                    // positions:
+                    position : 'absolute',
+                    
+                    
+                    
+                    // backgrounds:
+                    backg    : backgRefs.backg,
+                    
+                    
+                    
+                    // borders:
+                    ...expandBorderStroke(), // expand borderStroke css vars
+                    borderInlineStartColor : 'transparent',
+                    borderBlockStartColor  : 'transparent',
+                    
+                    
+                    
+                    // customize:
+                    ...usesGeneralProps(usesPrefixedProps(cssProps, 'arrow')), // apply general cssProps starting with arrow***
                 }),
             }),
             ...rules([
                 ...['top', 'bottom', 'left', 'right'].map((tooltipPos) =>
-                    rule(`[data-popper-placement^="${tooltipPos}"]>&`, {
+                    rule([
+                        `.${tooltipPos}`,
+                        `.${tooltipPos}-start`,
+                        `.${tooltipPos}-end`,
+                    ], {
+                        // // children:
+                        // ...children(arrowWrapperElm, {
+                        //     [tooltipPos] : 'calc(100% - 0.7px)',
+                        // }),
+                        
                         // children:
-                        ...children(arrowWrapperElm, {
-                            [tooltipPos] : 'calc(100% - 0.7px)',
-                            
-                            
-                            
-                            // children:
-                            ...children(arrowElm, {
-                                // customize:
-                                ...usesGeneralProps(usesPrefixedProps(usesPrefixedProps(cssProps, 'arrow'), tooltipPos)), // apply general cssProps starting with arrow*** and then starting with ***${tooltipPos}
-                            }),
+                        ...children(arrowElm, {
+                            // customize:
+                            ...usesGeneralProps(usesPrefixedProps(usesPrefixedProps(cssProps, 'arrow'), tooltipPos)), // apply general cssProps starting with arrow*** and then starting with ***${tooltipPos}
                         }),
                     }),
                 ),
@@ -224,11 +227,6 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         
         
         
-        // spacings:
-        margin               : '0.6rem',
-        
-        
-        
         // typos:
         whiteSpace           : 'nowrap',
         fontSize             : [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
@@ -241,12 +239,35 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         arrowInlineSize      : '0.8rem',
         arrowBlockSize       : '0.8rem',
         arrowClipPath        : 'polygon(100% 0%,100% 100%,0 100%)',
-        arrowTopTransform    : [['scaleX(0.7)', 'translateY(-50%)', 'rotate(45deg)' ]],
-        arrowRightTransform  : [['scaleY(0.7)', 'translateX(50%)' , 'rotate(135deg)']],
-        arrowBottomTransform : [['scaleX(0.7)', 'translateY(50%)' , 'rotate(225deg)']],
-        arrowLeftTransform   : [['scaleY(0.7)', 'translateX(-50%)', 'rotate(315deg)']],
+        arrowTopTransform    : [['scaleX(0.7)', 'translateY(calc((50% - 0.8px) *  1))', 'rotate(45deg)' ]],
+        arrowRightTransform  : [['scaleY(0.7)', 'translateX(calc((50% - 0.8px) * -1))', 'rotate(135deg)']],
+        arrowBottomTransform : [['scaleX(0.7)', 'translateY(calc((50% - 0.8px) * -1))', 'rotate(225deg)']],
+        arrowLeftTransform   : [['scaleY(0.7)', 'translateX(calc((50% - 0.8px) *  1))', 'rotate(315deg)']],
     };
 }, { prefix: 'ttip' });
+
+
+
+// utilities:
+const isEnabled = (target: HTMLElement|null|undefined) => {
+    if (!target) return false; // if no target => assumes target as disabled
+    
+    return !target.matches(':disabled, .disable, .disabled')
+};
+
+
+export interface CalculateArrowSizeProps {
+    arrow     : HTMLElement
+    placement : PopupPlacement
+}
+export type CalculateArrowSize = (props: CalculateArrowSizeProps) => Promise<readonly [number, number]>
+const defaultCalculateArrowSize : CalculateArrowSize = async ({ arrow, placement }) => {
+    const { width, height, }   = arrow.getBoundingClientRect();
+    return [
+        width  / 2,
+        height / 2,
+    ];
+};
 
 
 
@@ -256,6 +277,10 @@ export interface TooltipProps<TElement extends HTMLElement = HTMLElement>
     extends
         PopupProps<TElement>
 {
+    // popups:
+    unsafe_calculateArrowSize? : CalculateArrowSize
+    
+    
     // debounces:
     activeDelay?  : number
     passiveDelay? : number
@@ -282,9 +307,19 @@ export function Tooltip<TElement extends HTMLElement = HTMLElement>(props: Toolt
         
         
         
+        // popups:
+        unsafe_calculateArrowSize : calculateArrowSize = defaultCalculateArrowSize,
+        
+        
+        
         // debounces:
         activeDelay  = 300,
         passiveDelay = 500,
+        
+        
+        
+        // popups:
+        onPopupUpdate,
     ...restProps}  = props;
     
     
@@ -400,6 +435,104 @@ export function Tooltip<TElement extends HTMLElement = HTMLElement>(props: Toolt
     
     
     
+    // callbacks:
+    const arrowOffsetMiddleware = useCallback((arrow: HTMLElement): PopupMiddleware => {
+        return {
+            name: 'arrowOffset',
+            async fn({ placement, x, y }) {
+                const parentStyle = arrow.parentElement?.style;
+                const { display, visibility, transition, animation } = parentStyle ?? {}
+                if (parentStyle) {
+                    parentStyle.display    = 'block';
+                    parentStyle.visibility = 'hidden';
+                    parentStyle.transition = 'none';
+                    parentStyle.animation  = 'none';
+                } // if
+                
+                const [width, height] = await calculateArrowSize({ arrow, placement });
+                
+                if (parentStyle) {
+                    parentStyle.display    = display    ?? '';
+                    parentStyle.visibility = visibility ?? '';
+                    parentStyle.transition = transition ?? '';
+                    parentStyle.animation  = animation  ?? '';
+                } // if
+                
+                
+                
+                const basePlacement = placement.split('-')[0];
+                const isTop    = (basePlacement === 'top'   );
+                const isBottom = (basePlacement === 'bottom');
+                const isLeft   = (basePlacement === 'left'  );
+                const isRight  = (basePlacement === 'right' );
+                return {
+                    x: x - (isLeft ? width  : 0) + (isRight  ? width  : 0),
+                    y: y - (isTop  ? height : 0) + (isBottom ? height : 0),
+                };
+            }
+        };
+    }, [calculateArrowSize]);
+    
+    const arrowRef = useRef<HTMLDivElement>(null);
+    const middlewareWithArrow   = useCallback(async (defaultMiddleware: PopupMiddleware[]) => {
+        const arrow = arrowRef.current;
+        if (!arrow) return defaultMiddleware;
+        
+        
+        
+        const popupRef = arrow.parentElement;
+        const style = popupRef ? getComputedStyle(popupRef) : null;
+        const maxBorderRadius : number|null = !style ? null : Math.max(...[
+            style.borderStartStartRadius,
+            style.borderStartEndRadius,
+            style.borderEndStartRadius,
+            style.borderEndEndRadius,
+        ].map((str) => Math.round(Number.parseFloat(str))));
+        
+        
+        
+        const { arrow: arrowMiddleware } = await import(/* webpackChunkName: 'floating-ui' */ '@floating-ui/dom');
+        
+        
+        
+        return [
+            ...defaultMiddleware,
+            arrowMiddleware({
+                element : arrow,
+                padding : maxBorderRadius ?? 0,
+            }),
+            arrowOffsetMiddleware(arrow),
+        ];
+    }, [arrowOffsetMiddleware]);
+    
+    const handlePopupUpdate     = useCallback(async (computedPosition: ComputePositionReturn) => {
+        onPopupUpdate?.(computedPosition);
+        
+        
+        
+        const arrow = arrowRef.current;
+        if (!arrow) return;
+        const { middlewareData, placement } = computedPosition;
+        const { x, y } = middlewareData.arrow ?? {};
+        const basePlacement : PopupSide = placement.split('-')[0] as PopupSide;
+        const invertBasePlacement : PopupSide = {
+            top    : 'bottom',
+            right  : 'left',
+            bottom : 'top',
+            left   : 'right',
+        }[basePlacement] as PopupSide;
+        
+        Object.assign(arrow.style, {
+            left                  : ((x ?? false) !== false) ? `${x}px` : '',
+            top                   : ((y ?? false) !== false) ? `${y}px` : '',
+            right                 : '',
+            bottom                : '',
+            [invertBasePlacement] : '0',
+        });
+    }, [onPopupUpdate]);
+    
+    
+    
     // jsx:
     return (
         <Popup<TElement>
@@ -407,9 +540,11 @@ export function Tooltip<TElement extends HTMLElement = HTMLElement>(props: Toolt
             {...restProps}
             
             
+            
             // semantics:
             semanticTag ={props.semanticTag  ?? [null]   }
             semanticRole={props.semanticRole ?? 'tooltip'}
+            
             
             
             // accessibilities:
@@ -419,8 +554,16 @@ export function Tooltip<TElement extends HTMLElement = HTMLElement>(props: Toolt
             }}
             
             
+            
             // popups:
             popupPlacement={props.popupPlacement ?? 'top'}
+            popupMiddleware={middlewareWithArrow}
+            
+            popupAutoFlip={props.popupAutoFlip ?? true}
+            popupAutoShift={props.popupAutoShift ?? true}
+            
+            onPopupUpdate={handlePopupUpdate}
+            
             
             
             // classes:
@@ -428,15 +571,22 @@ export function Tooltip<TElement extends HTMLElement = HTMLElement>(props: Toolt
         >
             { props.children }
             <div
+                // essentials:
+                ref={arrowRef}
+                
+                
+                
                 // semantics:
                 aria-hidden={true} // the arrow is just for decoration purpose, no meaningful content here
                 
                 
-                data-popper-arrow
+                
+                // classes:
+                className='arrow'
             ></div>
         </Popup>
     );
 }
 export { Tooltip as default }
 
-export type { PopupPlacement, PopupModifier, PopupPosition }
+export type { PopupPlacement, PopupMiddleware, PopupStrategy }
