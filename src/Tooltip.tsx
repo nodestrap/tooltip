@@ -58,10 +58,6 @@ import type {
 import {
     // hooks:
     usesSizeVariant,
-    usesBackg,
-    usesBorder,
-    usesBorderStroke,
-    expandBorderStroke,
 }                           from '@nodestrap/basic'
 import {
     // general types:
@@ -89,17 +85,6 @@ import {
 const arrowElm = '.arrow';
 
 export const usesTooltipLayout = () => {
-    // dependencies:
-    
-    // colors:
-    const [, backgRefs ] = usesBackg();
-    const [border      ] = usesBorder();
-    
-    // borders:
-    const [borderStroke] = usesBorderStroke();
-    
-    
-    
     return style({
         ...imports([
             // layouts:
@@ -108,62 +93,46 @@ export const usesTooltipLayout = () => {
         ...style({
             // children:
             ...children(arrowElm, {
-                // children:
-                ...imports([
-                    // colors:
-                    border(),
-                    
-                    // borders:
-                    borderStroke(),
-                ]),
-                ...style({
-                    // layouts:
-                    display  : 'block',
-                    content  : '""',
-                    
-                    
-                    
-                    // positions:
-                    position : 'absolute',
-                    
-                    
-                    
-                    // backgrounds:
-                    backg    : backgRefs.backg,
-                    
-                    
-                    
-                    // borders:
-                    ...expandBorderStroke(), // expand borderStroke css vars
-                    borderInlineStartColor : 'transparent',
-                    borderBlockStartColor  : 'transparent',
-                    
-                    
-                    
-                    // customize:
-                    ...usesGeneralProps(usesPrefixedProps(cssProps, 'arrow')), // apply general cssProps starting with arrow***
+                // layouts:
+                content     : '""',
+                display     : 'block',
+                ...rule([':not(.overlay)&', '.nude&'], {
+                    display : 'none',
                 }),
-            }),
-            ...rules([
-                ...['top', 'bottom', 'left', 'right'].map((tooltipPos) =>
-                    rule([
-                        `.${tooltipPos}`,
-                        `.${tooltipPos}-start`,
-                        `.${tooltipPos}-end`,
-                    ], {
-                        // // children:
-                        // ...children(arrowWrapperElm, {
-                        //     [tooltipPos] : 'calc(100% - 0.7px)',
-                        // }),
-                        
-                        // children:
-                        ...children(arrowElm, {
+                
+                
+                
+                // positions:
+                position    : 'absolute',
+                
+                
+                
+                // backgrounds:
+                backg       : 'inherit',
+                
+                
+                
+                // borders:
+                border      : 'inherit',
+                boxShadow   : 'inherit',
+                
+                
+                
+                // customize:
+                ...usesGeneralProps(usesPrefixedProps(cssProps, 'arrow')), // apply general cssProps starting with arrow***
+                ...rules([
+                    ...['top', 'bottom', 'left', 'right'].map((tooltipPos) =>
+                        rule([
+                            `.${tooltipPos}&`,
+                            `.${tooltipPos}-start&`,
+                            `.${tooltipPos}-end&`,
+                        ], {
                             // customize:
                             ...usesGeneralProps(usesPrefixedProps(usesPrefixedProps(cssProps, 'arrow'), tooltipPos)), // apply general cssProps starting with arrow*** and then starting with ***${tooltipPos}
                         }),
-                    }),
-                ),
-            ]),
+                    ),
+                ]),
+            }),
             
             
             
@@ -221,7 +190,7 @@ export const useTooltipSheet = createUseSheet(() => [
 
 // configs:
 export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
-    return {
+    const basics = {
         // backgrounds:
         boxShadow            : [[0, 0, '10px', 'rgba(0,0,0,0.5)']],
         
@@ -238,13 +207,34 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         // sizes:
         arrowInlineSize      : '0.8rem',
         arrowBlockSize       : '0.8rem',
-        arrowClipPath        : 'polygon(100% 0%,100% 100%,0 100%)',
+     // arrowClipPath        : 'polygon(100% 0, 100% 100%, 0 100%)',
+        arrowClipPath        : 'polygon(200% -100%, 200% 200%, -100% 200%)', // compensates for boxShadow
         arrowTopTransform    : [['scaleX(0.7)', 'translateY(calc((50% - 0.8px) *  1))', 'rotate(45deg)' ]],
         arrowRightTransform  : [['scaleY(0.7)', 'translateX(calc((50% - 0.8px) * -1))', 'rotate(135deg)']],
         arrowBottomTransform : [['scaleX(0.7)', 'translateY(calc((50% - 0.8px) * -1))', 'rotate(225deg)']],
         arrowLeftTransform   : [['scaleY(0.7)', 'translateX(calc((50% - 0.8px) *  1))', 'rotate(315deg)']],
     };
+    
+    return {
+        ...basics,
+        
+        
+        
+        // sizes:
+        arrowInlineSizeSm    : [['calc((', basics.arrowInlineSize, ')*0.75)']],
+        arrowBlockSizeSm     : [['calc((', basics.arrowBlockSize , ')*0.75)']],
+        arrowInlineSizeLg    : [['calc((', basics.arrowInlineSize, ')*1.50)']],
+        arrowBlockSizeLg     : [['calc((', basics.arrowBlockSize , ')*1.50)']],
+    }
 }, { prefix: 'ttip' });
+
+
+
+// setup css variables:
+cssProps.arrowInlineSizeSm    = [['calc((', cssProps.arrowInlineSize, ')*0.75)']] as any;
+cssProps.arrowBlockSizeSm     = [['calc((', cssProps.arrowBlockSize , ')*0.75)']] as any;
+cssProps.arrowInlineSizeLg    = [['calc((', cssProps.arrowInlineSize, ')*1.50)']] as any;
+cssProps.arrowBlockSizeLg     = [['calc((', cssProps.arrowBlockSize , ')*1.50)']] as any;
 
 
 
@@ -264,8 +254,8 @@ export type CalculateArrowSize = (props: CalculateArrowSizeProps) => Promise<rea
 const defaultCalculateArrowSize : CalculateArrowSize = async ({ arrow, placement }) => {
     const { width, height, }   = arrow.getBoundingClientRect();
     return [
-        width  / 2,
-        height / 2,
+        (width  / 2) - 1,
+        (height / 2) - 1,
     ];
 };
 
@@ -495,13 +485,17 @@ export function Tooltip<TElement extends HTMLElement = HTMLElement>(props: Toolt
         
         
         
+        const offsetMiddlewareIndex      = defaultMiddleware.findIndex((middleware) => (middleware.name === 'offset'));
+        const arrowOffsetMiddlewareIndex = offsetMiddlewareIndex + 1;
         return [
-            ...defaultMiddleware,
+            ...defaultMiddleware.slice(0, arrowOffsetMiddlewareIndex),
+            arrowOffsetMiddleware(arrow),
+            ...defaultMiddleware.slice(arrowOffsetMiddlewareIndex),
+            
             arrowMiddleware({
                 element : arrow,
                 padding : maxBorderRadius ?? 0,
             }),
-            arrowOffsetMiddleware(arrow),
         ];
     }, [arrowOffsetMiddleware]);
     

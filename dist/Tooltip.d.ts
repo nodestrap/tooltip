@@ -5,6 +5,10 @@ export declare const usesTooltipVariants: () => import("@cssfn/cssfn").Rule;
 export declare const usesTooltipStates: () => import("@cssfn/cssfn").Rule;
 export declare const useTooltipSheet: import("@cssfn/types").Factory<import("jss").Classes<"main">>;
 export declare const cssProps: import("@cssfn/css-config").Refs<{
+    arrowInlineSizeSm: string[][];
+    arrowBlockSizeSm: string[][];
+    arrowInlineSizeLg: string[][];
+    arrowBlockSizeLg: string[][];
     boxShadow: (string | number)[][];
     whiteSpace: string;
     fontSize: string[][];
@@ -18,6 +22,10 @@ export declare const cssProps: import("@cssfn/css-config").Refs<{
     arrowBottomTransform: string[][];
     arrowLeftTransform: string[][];
 }>, cssDecls: import("@cssfn/css-config").Decls<{
+    arrowInlineSizeSm: string[][];
+    arrowBlockSizeSm: string[][];
+    arrowInlineSizeLg: string[][];
+    arrowBlockSizeLg: string[][];
     boxShadow: (string | number)[][];
     whiteSpace: string;
     fontSize: string[][];
@@ -31,6 +39,10 @@ export declare const cssProps: import("@cssfn/css-config").Refs<{
     arrowBottomTransform: string[][];
     arrowLeftTransform: string[][];
 }>, cssVals: import("@cssfn/css-config").Vals<{
+    arrowInlineSizeSm: string[][];
+    arrowBlockSizeSm: string[][];
+    arrowInlineSizeLg: string[][];
+    arrowBlockSizeLg: string[][];
     boxShadow: (string | number)[][];
     whiteSpace: string;
     fontSize: string[][];

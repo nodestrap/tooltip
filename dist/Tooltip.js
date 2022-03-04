@@ -21,19 +21,13 @@ import typos from '@nodestrap/typos'; // configurable typography (texting) defs
 // nodestrap components:
 import { 
 // hooks:
-usesSizeVariant, usesBackg, usesBorder, usesBorderStroke, expandBorderStroke, } from '@nodestrap/basic';
+usesSizeVariant, } from '@nodestrap/basic';
 import { 
 // styles:
 usesPopupLayout, usesPopupVariants, usesPopupStates, Popup, } from '@nodestrap/popup';
 // styles:
 const arrowElm = '.arrow';
 export const usesTooltipLayout = () => {
-    // dependencies:
-    // colors:
-    const [, backgRefs] = usesBackg();
-    const [border] = usesBorder();
-    // borders:
-    const [borderStroke] = usesBorderStroke();
     return style({
         ...imports([
             // layouts:
@@ -42,46 +36,32 @@ export const usesTooltipLayout = () => {
         ...style({
             // children:
             ...children(arrowElm, {
-                // children:
-                ...imports([
-                    // colors:
-                    border(),
-                    // borders:
-                    borderStroke(),
-                ]),
-                ...style({
-                    // layouts:
-                    display: 'block',
-                    content: '""',
-                    // positions:
-                    position: 'absolute',
-                    // backgrounds:
-                    backg: backgRefs.backg,
-                    // borders:
-                    ...expandBorderStroke(),
-                    borderInlineStartColor: 'transparent',
-                    borderBlockStartColor: 'transparent',
-                    // customize:
-                    ...usesGeneralProps(usesPrefixedProps(cssProps, 'arrow')), // apply general cssProps starting with arrow***
+                // layouts:
+                content: '""',
+                display: 'block',
+                ...rule([':not(.overlay)&', '.nude&'], {
+                    display: 'none',
                 }),
-            }),
-            ...rules([
-                ...['top', 'bottom', 'left', 'right'].map((tooltipPos) => rule([
-                    `.${tooltipPos}`,
-                    `.${tooltipPos}-start`,
-                    `.${tooltipPos}-end`,
-                ], {
-                    // // children:
-                    // ...children(arrowWrapperElm, {
-                    //     [tooltipPos] : 'calc(100% - 0.7px)',
-                    // }),
-                    // children:
-                    ...children(arrowElm, {
+                // positions:
+                position: 'absolute',
+                // backgrounds:
+                backg: 'inherit',
+                // borders:
+                border: 'inherit',
+                boxShadow: 'inherit',
+                // customize:
+                ...usesGeneralProps(usesPrefixedProps(cssProps, 'arrow')),
+                ...rules([
+                    ...['top', 'bottom', 'left', 'right'].map((tooltipPos) => rule([
+                        `.${tooltipPos}&`,
+                        `.${tooltipPos}-start&`,
+                        `.${tooltipPos}-end&`,
+                    ], {
                         // customize:
                         ...usesGeneralProps(usesPrefixedProps(usesPrefixedProps(cssProps, 'arrow'), tooltipPos)), // apply general cssProps starting with arrow*** and then starting with ***${tooltipPos}
-                    }),
-                })),
-            ]),
+                    })),
+                ]),
+            }),
             // customize:
             ...usesGeneralProps(cssProps), // apply general cssProps
         }),
@@ -123,7 +103,7 @@ export const useTooltipSheet = createUseSheet(() => [
 ], /*sheetId :*/ '3h41koviqh'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
 // configs:
 export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
-    return {
+    const basics = {
         // backgrounds:
         boxShadow: [[0, 0, '10px', 'rgba(0,0,0,0.5)']],
         // typos:
@@ -134,13 +114,27 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         // sizes:
         arrowInlineSize: '0.8rem',
         arrowBlockSize: '0.8rem',
-        arrowClipPath: 'polygon(100% 0%,100% 100%,0 100%)',
+        // arrowClipPath        : 'polygon(100% 0, 100% 100%, 0 100%)',
+        arrowClipPath: 'polygon(200% -100%, 200% 200%, -100% 200%)',
         arrowTopTransform: [['scaleX(0.7)', 'translateY(calc((50% - 0.8px) *  1))', 'rotate(45deg)']],
         arrowRightTransform: [['scaleY(0.7)', 'translateX(calc((50% - 0.8px) * -1))', 'rotate(135deg)']],
         arrowBottomTransform: [['scaleX(0.7)', 'translateY(calc((50% - 0.8px) * -1))', 'rotate(225deg)']],
         arrowLeftTransform: [['scaleY(0.7)', 'translateX(calc((50% - 0.8px) *  1))', 'rotate(315deg)']],
     };
+    return {
+        ...basics,
+        // sizes:
+        arrowInlineSizeSm: [['calc((', basics.arrowInlineSize, ')*0.75)']],
+        arrowBlockSizeSm: [['calc((', basics.arrowBlockSize, ')*0.75)']],
+        arrowInlineSizeLg: [['calc((', basics.arrowInlineSize, ')*1.50)']],
+        arrowBlockSizeLg: [['calc((', basics.arrowBlockSize, ')*1.50)']],
+    };
 }, { prefix: 'ttip' });
+// setup css variables:
+cssProps.arrowInlineSizeSm = [['calc((', cssProps.arrowInlineSize, ')*0.75)']];
+cssProps.arrowBlockSizeSm = [['calc((', cssProps.arrowBlockSize, ')*0.75)']];
+cssProps.arrowInlineSizeLg = [['calc((', cssProps.arrowInlineSize, ')*1.50)']];
+cssProps.arrowBlockSizeLg = [['calc((', cssProps.arrowBlockSize, ')*1.50)']];
 // utilities:
 const isEnabled = (target) => {
     if (!target)
@@ -150,8 +144,8 @@ const isEnabled = (target) => {
 const defaultCalculateArrowSize = async ({ arrow, placement }) => {
     const { width, height, } = arrow.getBoundingClientRect();
     return [
-        width / 2,
-        height / 2,
+        (width / 2) - 1,
+        (height / 2) - 1,
     ];
 };
 export function Tooltip(props) {
@@ -296,13 +290,16 @@ export function Tooltip(props) {
             style.borderEndEndRadius,
         ].map((str) => Math.round(Number.parseFloat(str))));
         const { arrow: arrowMiddleware } = await import(/* webpackChunkName: 'floating-ui' */ '@floating-ui/dom');
+        const offsetMiddlewareIndex = defaultMiddleware.findIndex((middleware) => (middleware.name === 'offset'));
+        const arrowOffsetMiddlewareIndex = offsetMiddlewareIndex + 1;
         return [
-            ...defaultMiddleware,
+            ...defaultMiddleware.slice(0, arrowOffsetMiddlewareIndex),
+            arrowOffsetMiddleware(arrow),
+            ...defaultMiddleware.slice(arrowOffsetMiddlewareIndex),
             arrowMiddleware({
                 element: arrow,
                 padding: maxBorderRadius ?? 0,
             }),
-            arrowOffsetMiddleware(arrow),
         ];
     }, [arrowOffsetMiddleware]);
     const handlePopupUpdate = useCallback(async (computedPosition) => {
