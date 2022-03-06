@@ -107,7 +107,7 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         // backgrounds:
         boxShadow: [[0, 0, '10px', 'rgba(0,0,0,0.5)']],
         // typos:
-        whiteSpace: 'nowrap',
+        whiteSpace: 'normal',
         fontSize: [['calc((', typos.fontSizeSm, '+', typos.fontSizeNm, ')/2)']],
         fontSizeSm: typos.fontSizeSm,
         fontSizeLg: typos.fontSizeNm,
